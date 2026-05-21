@@ -7,11 +7,12 @@ pipeline {
     }
 
     stages {
+
         stage('Checkout Code') {
-            steps {
-                git branch: 'main',
-                    url: 'https://github.com/Praveen-Rathod1/Jenkins_Repo.git'
-            }
+             steps {
+        git branch: 'main',
+        url: 'https://github.com/Praveen-Rathod1/Jenkins_Repo.git'
+    }
         }
 
         stage('Build') {
@@ -24,16 +25,26 @@ pipeline {
 
         stage('Upload to JFrog') {
             steps {
-                withCredentials([usernamePassword(credentialsId: 'jfrog-creds',
-                                                 usernameVariable: 'JFROG_USER',
-                                                 passwordVariable: 'JFROG_PASS')]) {
+
+                withCredentials([
+                    usernamePassword(
+                        credentialsId: 'jfrog-creds',
+                        usernameVariable: 'JFROG_USER',
+                        passwordVariable: 'JFROG_PASS'
+                    )
+                ]) {
+
                     sh '''
                         echo "Uploading WAR to JFrog..."
+
                         WAR_FILE=$(ls sample-app/target/*.war)
+
                         FILE_NAME="${JOB_NAME}-${BUILD_NUMBER}-sample.war"
+
                         echo "Uploading file as: $FILE_NAME"
-                        curl -u $JFROG_USER:$JFROG_PASS -T $WAR_FILE \
-                        "https://trial9krpxa.jfrog.io/artifactory/testrepo-generic-local/${JOB_NAME}-${BUILD_NUMBER}-sample.war"
+
+                        curl -u $JFROG_USER:$JFROG_PASS -T "$WAR_FILE" \
+                        "https://triallb6d6m.jfrog.io/artifactory/jenkinsjava-generic-local/$FILE_NAME"
                     '''
                 }
             }
