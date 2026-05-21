@@ -9,35 +9,31 @@ pipeline {
     stages {
 
         stage('Checkout Code') {
-             steps {
-        git branch: 'main',
-        url: 'https://github.com/Praveen-Rathod1/Jenkins_Repo.git'
-    }
+            steps {
+                git branch: 'main',
+                url: 'https://github.com/Praveen-Rathod1/Jenkins_Repo.git'
+            }
         }
 
         stage('Build') {
             steps {
-                dir('sample-app') {
-                    sh 'mvn clean package -DskipTests'
-                }
+                sh 'mvn clean package -DskipTests'
             }
         }
 
         stage('Upload to JFrog') {
             steps {
 
-                withCredentials([
-                    usernamePassword(
-                        credentialsId: 'jfrog-creds',
-                        usernameVariable: 'JFROG_USER',
-                        passwordVariable: 'JFROG_PASS'
-                    )
-                ]) {
+                withCredentials([usernamePassword(
+                    credentialsId: 'jfrog-creds',
+                    usernameVariable: 'JFROG_USER',
+                    passwordVariable: 'JFROG_PASS'
+                )]) {
 
                     sh '''
                         echo "Uploading WAR to JFrog..."
 
-                        WAR_FILE=$(ls sample-app/target/*.war)
+                        WAR_FILE=$(ls target/*.war)
 
                         FILE_NAME="${JOB_NAME}-${BUILD_NUMBER}-sample.war"
 
